@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Prediction</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <h1>Sales Prediction</h1>
+    <form id="prediction-form">
+        <label for="location">Location Alias:</label>
+        <input type="text" id="location" name="location" required><br><br>
+        
+        <button type="submit">Predict</button>
+    </form>
+    <div id="results"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('prediction-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Collect form data
+                const formData = {
+                    location: document.getElementById('location').value
+                };
+
+                // Send POST request to the /predict endpoint
+                fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        // Display error message
+                        document.getElementById('results').innerHTML = `<p style="color: red;">Error: ${data.error}</p>`;
+                    } else {
+                        // Display prediction results
+                        document.getElementById('results').innerHTML = `
+                            <h2>Prediction Results:</h2>
+                            <p>Predicted Quantity: ${data.predicted_qty}</p>
+                            <p>Predicted Value: ${data.predicted_value}</p>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    // Display general error message
+                    console.error('Error:', error);
+                    document.getElementById('results').innerHTML = '<p style="color: red;">An error occurred. Please try again.</p>';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
